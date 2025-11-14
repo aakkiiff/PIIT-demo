@@ -10,6 +10,3 @@ security_group_ids = ["sg-0937d064d619c9877"]
 
 instance_name  = "terraform-ec2"
 user_data_file = "user-data.sh"
-
-
-
