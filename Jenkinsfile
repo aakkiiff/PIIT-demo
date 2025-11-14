@@ -3,10 +3,7 @@ pipeline {
 
     environment {
         IMAGE_TAG = "$BUILD_NUMBER"
-        dockerhub_credential_id = "dockerhub"
-        APP_NAME = "yourmentors_fe"
-        GIT_REPO = "https://github.com/aakkiiff/um_main.git"
-        UPSTRING_CONFIG_PROJECT_NAME = "config_pipeline"
+        GIT_REPO = "https://github.com/aakkiiff/PIIT-demo.git"
      }
 
 
@@ -32,17 +29,51 @@ pipeline {
             }
         }
 
-        stage("BUILD+PUSH DOCKER IMAGES TO DOCKERHUB"){
+        stage("CODE BUILDING"){
             steps{
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'PASSWORD', usernameVariable: 'USER_NAME')]) {
-                    sh'docker build --no-cache -t ${USER_NAME}/${APP_NAME}:${IMAGE_TAG} .'   
-                    sh'echo ${PASSWORD} | docker login --username ${USER_NAME} --password-stdin'
-                    sh'docker push ${USER_NAME}/${APP_NAME}:${IMAGE_TAG}'
-                    sh'docker logout'
-                }
+                
+                sh'echo "Building successful"'
             }
         }
 
+        stage("BUILD DOCKER IMAGE"){
+            steps{
+                    sh'docker build --no-cache -t pitdemo_container:${IMAGE_TAG} .'   
+                
+            }
+        }
+
+        stage("STOP PREVIOUS CONTAINER"){
+            steps{
+                script{
+                    sh'''
+                    if [ $(docker ps -aq -f name=pitdemo_container) ]; then
+                        docker stop pitdemo_container
+                        docker rm pitdemo_container
+                    else
+                        echo "No previous container running"
+                    fi
+                    '''
+                }
+            }
+        }
+        stage("RUN DOCKER CONTAINER"){
+            steps{
+                
+                sh'docker run -d -p 80:80 --name pitdemo_container pitdemo_container:${IMAGE_TAG}'
+            }
+        }
+        stage("NOTIFY DEPLOYMENT SUCCESS"){
+            steps{
+                
+                sh'''
+                curl -H "Content-Type: application/json" \
+                -X POST \
+                -d '{"content": "Deployment Successful! Application is running on port 8080"}' \
+                https://discordapp.com/api/webhooks/1430485170175348746/D8_wVuznBj8cohGsvbC2tyyu_pAJq5NNNqBK7D42uVlOakUaJB6SIElE9X01xIcKJNqc
+                '''
+            }
+        }
         
     }
 

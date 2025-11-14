@@ -18,7 +18,7 @@ function App() {
       </div>
       <div className="connect-section">
         {/*p tag this is version one */}
-        <p>welcome to peopleNtech v1</p>
+        <p>welcome to peopleNtech v0</p>
       </div>
     </>
   )
