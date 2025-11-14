@@ -44,3 +44,5 @@ dist-ssr
 ./infrastructure/terraform/override.tf.json
 ./infrastructure/terraform/*_override.tf
 ./infrastructure/terraform/*_override.tf.json
+
+infrastructure/terraform/.terra*
